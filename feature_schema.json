@@ -1,0 +1,98 @@
+{
+
+  
+
+"common_features": {
+    "numerical": [
+      "age",
+      "length_of_stay_hours",
+      "billed_amount",
+      "approved_amount",
+      "payment_days",
+      "visit_month",
+      "visit_day"
+    ],
+    "categorical": [
+      "gender",
+      "department",
+      "visit_type",
+      "insurance_provider"
+    ],
+    "engineered_features": [
+      "visit_month",
+      "visit_day"
+    ],
+    "dropped_columns": [
+      "patient_id",
+      "visit_id",
+      "billing_id",
+      "visit_date",
+      "billing_date"
+    ]
+  },
+
+  "models": {
+
+    "risk_model": {
+      "target": {
+        "name": "risk_encoded",
+        "original_column": "risk_score",
+        "classes": {
+          "Low": 0,
+          "Medium": 1,
+          "High": 2
+        }
+      },
+      "preprocessing": {
+        "target_encoding": "LabelEncoder",
+        "categorical_encoding": "OneHotEncoding",
+        "imbalance_handling": "SMOTE"
+      },
+      "split_strategy": {
+        "type": "Per-patient time-based split",
+        "column": "visit_date",
+        "ratio": "80:20"
+      },
+      "model": {
+        "name": "XGBoost Classifier",
+        "parameters": {
+          "n_estimators": 300,
+          "learning_rate": 0.1,
+          "max_depth": 5
+        }
+      }
+    },
+
+    "claim_model": {
+      "target": {
+        "name": "claim_status_encoded",
+        "original_column": "claim_status",
+        "classes": {
+          "Rejected": 0,
+          "Pending": 1,
+          "Approved": 2
+        }
+      },
+      "preprocessing": {
+        "target_encoding": "LabelEncoder",
+        "categorical_encoding": "OneHotEncoding",
+        "imbalance_handling": "SMOTE"
+      },
+      "split_strategy": {
+        "type": "Per-patient time-based split",
+        "column": "visit_date",
+        "ratio": "80:20"
+      },
+      "model": {
+        "name": "LGBM Classifier",
+        "parameters": {
+          "n_estimators": 300,
+          "learning_rate": 0.05,
+          "max_depth": 5,
+          "class_weight": "balanced"
+        }
+      }
+    }
+
+  }
+}
